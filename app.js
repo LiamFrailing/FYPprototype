@@ -12,15 +12,16 @@ var config = require('./config');
 
 // Setup twitter connection details
 var T = new twit(config);
+var username = 'dapperlaughs';
 
-getProfile();
+getGender(username);
+getPersonalityProfile(username);
 
-
-// Retrieve the given users Twitter profile
-function getProfile(){
+// Determine the gender of the given user
+function getGender(username){
 
     var params = {
-        screen_name: 'dapperlaughs'
+        screen_name: username
     }
 
     var txt = '';
@@ -84,6 +85,54 @@ function getProfile(){
     }
 }
 
+// Determine the personality profile of the given user
+function getPersonalityProfile(username){
+
+    var params = {
+        screen_name: username,
+        count: 3000
+    }
+
+    var txt = '';
+
+    T.get('statuses/user_timeline', params, gotData);
+
+    function gotData(err, data, response){
+        
+        for (var i = 0; i < data.length; i++) {
+            txt += data[i].text;           
+        }
+        
+        var sentiment = new Sentiment();
+        var result = sentiment.analyze(txt);
+        var tonals = result.positive.concat(result.negative);
+        const csvFilePath = 'data/NRC-Emotion-Lexicon.csv';
+        
+        // emotions map for counting the number of time each emotion occurs in the tweets
+        var emotions = { 'anger': 0, 'anticipation': 0, 'disgust': 0, 'fear': 0, 'joy': 0, 'sadness': 0, 'surprise': 0, 'trust': 0};
+
+        csvtojson()
+        .fromFile(csvFilePath)
+        .then((jsonObj)=>{
+            for (var i = 0; i < tonals.length; i++) {
+                for (var x = 0; x < jsonObj.length; x++) {
+                        if(tonals[i].toLowerCase() == jsonObj[x].Word){
+                            emotions.anger += parseInt(jsonObj[x].Anger);
+                            emotions.anticipation += parseInt(jsonObj[x].Anticipation);
+                            emotions.disgust += parseInt(jsonObj[x].Disgust);
+                            emotions.fear += parseInt(jsonObj[x].Fear);
+                            emotions.joy += parseInt(jsonObj[x].Joy);
+                            emotions.sadness += parseInt(jsonObj[x].Sadness);
+                            emotions.surprise += parseInt(jsonObj[x].Surprise);
+                            emotions.trust += parseInt(jsonObj[x].Trust);
+                        }
+                }
+            }
+            console.log(emotions);
+        })
+    }
+
+}
 
 // Retrieve tweets according to search parameters
 function getTweets(){
@@ -104,18 +153,6 @@ function getTweets(){
         runSentiment(txt);
     }
 }
-
-
-/*
-// Function to run sentiment analysis on a given string
-window.onload = runApplication;
-
-// General application control function
-function runApplication(){
-    getTweets();
-    runSentiment("Cats are stupid.");
-}
-*/
 
 // Run sentiment analysis on the String provided in param
 function runSentiment(text){
