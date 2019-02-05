@@ -12,7 +12,8 @@ var config = require('./config');
 
 // Setup twitter connection details
 var T = new twit(config);
-var username = 'chayseimoni';
+var usernames = ['ElleGuest', 'chloeguest92', 'Elisemorgan789', 'LiamFrailing', 'MWyatt4', 'andy_elliott95', 'Ryantaylor1996', 'iAlexDean', 'JimmyMcArthur2', 'jakeypowell95'];
+var username = usernames[3];
 
 getGender(username);
 getPersonalityProfile(username);
@@ -90,7 +91,8 @@ function getPersonalityProfile(username){
 
     var params = {
         screen_name: username,
-        count: 3000
+        count: 3200,
+        include_rts: false
     }
 
     var txt = '';
@@ -102,6 +104,8 @@ function getPersonalityProfile(username){
         for (var i = 0; i < data.length; i++) {
             txt += data[i].text;           
         }
+
+        console.log(txt);
         
         var totalWords = txt.split(' ').length;
         var sentiment = new Sentiment();
@@ -132,52 +136,115 @@ function getPersonalityProfile(username){
             console.log(totalWords);
             console.log(tonals.length);
             console.log(emotions);
-            console.log("Dominance: " + (tonals.length / totalWords) + " and " + Math.abs(emotions.positive - emotions.negative) /  (emotions.positive + emotions.negative));
-            console.log("Influence: " + emotions.trust / tonals.length + " and " + emotions.anticipation / tonals.length + " and " + emotions.joy / tonals.length);
-            console.log("Steadiness: " + (tonals.length / totalWords) + " and " + emotions.joy / tonals.length);
-            console.log("Compliance: " + emotions.trust / tonals.length + " and " + emotions.fear / tonals.length);
 
-            console.log(tonals.length / totalWords);
-            console.log(Math.abs(emotions.positive - emotions.negative) /  (emotions.positive + emotions.negative));
+            console.log((tonals.length / totalWords) * 100 );
+            console.log((emotions.negative / tonals.length) * 100 );
+            console.log((emotions.surprise / tonals.length) * 100 );
+            console.log((emotions.anger / tonals.length) * 100 );
             console.log();
-            console.log(emotions.trust / tonals.length);
-            console.log(emotions.anticipation / tonals.length);
-            console.log(emotions.joy / tonals.length);
-            console.log();
-            console.log(tonals.length / totalWords);
-            console.log(emotions.joy / tonals.length);
-            console.log();
-            console.log(emotions.trust / tonals.length);
-            console.log(emotions.fear / tonals.length);
+            console.log((emotions.fear / tonals.length) * 100 );
+            console.log((emotions.trust / tonals.length) * 100 );
+            console.log((emotions.joy / tonals.length) * 100 );
+            console.log((emotions.anticipation / tonals.length) * 100 );
+
+            var dominanceCounter = 0;
+            var steadinessCounter = 0;
+
+            // Dominance OR Steadiness skew analysis - high emotion
+            var emotivePercent = (tonals.length / totalWords) * 100;
+            if( (Math.round(emotivePercent - 9)) >= 0){
+                dominanceCounter++;
+            } else if ((Math.round(emotivePercent - 7)) <= 0){ 
+                steadinessCounter++; }
+
+            // Dominance OR Steadiness skew analysis - high negativity
+            var negativityPercent = (emotions.negative / tonals.length) * 100;
+            if( Math.round((negativityPercent - 38)) >= 0){
+                dominanceCounter++;
+            } else if ((Math.round(negativityPercent - 32)) <= 0){ 
+                steadinessCounter++; }
+
+            // Dominance OR Steadiness skew analysis - high surprise
+            var surprisePercent = (emotions.surprise / tonals.length) * 100;
+            if( Math.round((surprisePercent - 9)) >= 0){
+                dominanceCounter++;
+            } else if ((Math.round(surprisePercent - 7)) <= 0){ 
+                steadinessCounter++; }
+
+            // Dominance OR Steadiness skew analysis - high anger
+            var angerPercent = (emotions.anger / tonals.length) * 100;
+            if( Math.round((angerPercent - 11)) >= 0){
+                dominanceCounter++;
+            } else if ((Math.round(angerPercent - 9)) <= 0){ 
+                steadinessCounter++; }
+
+            console.log('Dominance: ' + dominanceCounter + ' && ' + 'Steadiness: ' + steadinessCounter);
+
+            var influenceCounter = 0;
+            var complianceCounter = 0;
+
+            // Influence OR Compliance skew analysis - low fear
+            var fearPercent = (emotions.fear / tonals.length) * 100;
+            if( Math.round((fearPercent - 9)) <= 0){
+                influenceCounter++;
+            } else if ((Math.round(fearPercent - 11)) >= 0){ 
+                complianceCounter++; }
+
+            // Influence OR Compliance skew analysis - high trust
+            var trustPercent = (emotions.trust / tonals.length) * 100;
+            if( Math.round((trustPercent - 19)) >= 0){
+                influenceCounter++;
+            } else if ((Math.round(trustPercent - 15)) <= 0){ 
+                complianceCounter++; }
+
+            // Influence OR Compliance skew analysis - high joy
+            var joyPercent = (emotions.joy / tonals.length) * 100;
+            if( Math.round((joyPercent - 22)) >= 0){
+                influenceCounter++;
+            } else if ((Math.round(trustPercent - 18)) <= 0){ 
+                complianceCounter++; }
+
+            // Influence OR Compliance skew analysis - high anticipation
+            var anticipationPercent = (emotions.anticipation / tonals.length) * 100;
+            if( Math.round((anticipationPercent - 18)) >= 0){
+                influenceCounter++;
+            } else if ((Math.round(trustPercent - 14)) <= 0){ 
+                complianceCounter++; }
+
+            console.log('Influence: ' + influenceCounter + ' && ' + 'Compliance: ' + complianceCounter);
+
+            /* Percentage skew towards dominance or steadiness 
+            var emotiveWordSkew = (Math.round( (tonals.length / totalWords) * 100 )) - 8;
+            var emotiveVariationSkew = Math.round(Math.abs( (emotions.positive - emotions.negative) /  (emotions.positive + emotions.negative) * 100 )) - 16;
 
             /* conditions for DOMINANCE: 
                 - High % of emotive words relative to total word count
-                - High % of emotional mix (i.e. similarly high pos/neg count) */
-            if((tonals.length / totalWords) > 0.08 && 
-                Math.abs(emotions.positive - emotions.negative) / (emotions.positive + emotions.negative) < 0.16){
+                - High % of emotional variation (difference between pos/neg word count is low suggesting emotional swings)
+            if(Math.round(tonals.length / totalWords) > 0.08 && 
+                Math.round(Math.abs(emotions.positive - emotions.negative) / (emotions.positive + emotions.negative)) <= 0.16){
                 console.log("Dominance: YES");
             } else { console.log("Dominance: NO"); }
 
             /* conditions for INFLUENCE: 
                 - High % of trust words relative to tonal word count
                 - High % of anticipation words relative to tonal word count 
-                - High % of joy words relative to tonal word count */
-            if(emotions.trust / tonals.length > 0.13 && emotions.anticipation / tonals.length > 0.11 && emotions.joy / tonals.length > 0.16){
+                - High % of joy words relative to tonal word count
+            if(Math.round(emotions.trust / tonals.length) > 0.13 && Math.round(emotions.fear / tonals.length) <= 0.1){
                 console.log("Influence: YES");
             } else { console.log("Influence: NO"); }
 
             /* conditions for STEADINESS: 
-                - Low % of emotive words relative to total word count
-                - High % of joy relative to tonal word count */
-                if((tonals.length / totalWords) < 0.08 && 
-                (emotions.joy / tonals.length > 0.16)){
+                - Low % of emotional variation (difference between pos/neg word count)
+                - High % of joy relative to tonal word count
+            if(Math.round(tonals.length / totalWords) <= 0.08 && 
+                Math.round(Math.abs(emotions.positive - emotions.negative) / (emotions.positive + emotions.negative)) > 0.16){
                 console.log("Steadiness: YES");
             } else { console.log("Steadiness: NO"); }
 
             /* conditions for COMPLIANCE: 
                 - Low % of trust words relative to tonal word count
-                - High % of fear words relative to tonal word count */
-            if(emotions.trust / tonals.length < 0.13 && emotions.fear / tonals.length > 0.1){
+                - High % of fear words relative to tonal word count
+            if(Math.round(emotions.trust / tonals.length) <= 0.13 && Math.round(emotions.fear / tonals.length) > 0.1){
                 console.log("Compliance: YES");
             } else { console.log("Compliance: NO"); }
             /* No personality profile identified */
