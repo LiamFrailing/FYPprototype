@@ -13,7 +13,7 @@ var config = require('./config');
 // Setup twitter connection details
 var T = new twit(config);
 var usernames = ['ElleGuest', 'chloeguest92', 'Elisemorgan789', 'LiamFrailing', 'MWyatt4', 'andy_elliott95', 'Ryantaylor1996', 'iAlexDean', 'JimmyMcArthur2', 'jakeypowell95'];
-var username = usernames[3];
+var username = usernames[0];
 
 getGender(username);
 getPersonalityProfile(username);
@@ -137,81 +137,130 @@ function getPersonalityProfile(username){
             console.log(tonals.length);
             console.log(emotions);
 
-            console.log((tonals.length / totalWords) * 100 );
-            console.log((emotions.negative / tonals.length) * 100 );
-            console.log((emotions.surprise / tonals.length) * 100 );
+            console.log((tonals.length / totalWords) * 100);
+            var numMentions = 0;
+            for (var i = 0; i < txt.length; i++) {
+                if (txt.charAt(i) == "@") {
+                   numMentions ++;
+                }
+            }
+            console.log((numMentions / totalWords) * 100 );
             console.log((emotions.anger / tonals.length) * 100 );
-            console.log();
+            console.log((emotions.surprise / tonals.length) * 100 );
             console.log((emotions.fear / tonals.length) * 100 );
             console.log((emotions.trust / tonals.length) * 100 );
-            console.log((emotions.joy / tonals.length) * 100 );
+            console.log();
+            console.log((emotions.positive / tonals.length) * 100 );
+            console.log((numMentions / totalWords) * 100 );
             console.log((emotions.anticipation / tonals.length) * 100 );
+            console.log((emotions.joy / tonals.length) * 100 );
+            console.log((emotions.trust / tonals.length) * 100 );
+            console.log((emotions.fear / tonals.length) * 100 );
 
             var dominanceCounter = 0;
             var steadinessCounter = 0;
 
             // Dominance OR Steadiness skew analysis - high emotion
             var emotivePercent = (tonals.length / totalWords) * 100;
-            if( (Math.round(emotivePercent - 9)) >= 0){
+            if( (Math.round(emotivePercent - 8)) >= 0){
                 dominanceCounter++;
-            } else if ((Math.round(emotivePercent - 7)) <= 0){ 
+            } else { 
                 steadinessCounter++; }
-
-            // Dominance OR Steadiness skew analysis - high negativity
-            var negativityPercent = (emotions.negative / tonals.length) * 100;
-            if( Math.round((negativityPercent - 38)) >= 0){
+            
+            // Dominance OR Steadiness skew analysis - high mention count
+            var numMentions = 0;
+            for (var i = 0; i < txt.length; i++) {
+                if (txt.charAt(i) == "@") {
+                   numMentions ++;
+                }
+            }
+            var mentionPercent = (numMentions / totalWords) * 100;
+            if( (Math.round(mentionPercent - 10)) >= 0){
                 dominanceCounter++;
-            } else if ((Math.round(negativityPercent - 32)) <= 0){ 
+            } else { 
                 steadinessCounter++; }
-
-            // Dominance OR Steadiness skew analysis - high surprise
-            var surprisePercent = (emotions.surprise / tonals.length) * 100;
-            if( Math.round((surprisePercent - 9)) >= 0){
-                dominanceCounter++;
-            } else if ((Math.round(surprisePercent - 7)) <= 0){ 
-                steadinessCounter++; }
-
+            
             // Dominance OR Steadiness skew analysis - high anger
             var angerPercent = (emotions.anger / tonals.length) * 100;
-            if( Math.round((angerPercent - 11)) >= 0){
+            if( (Math.round(angerPercent - 10)) >= 0){
                 dominanceCounter++;
-            } else if ((Math.round(angerPercent - 9)) <= 0){ 
+            } else { 
+                steadinessCounter++; }
+            
+            // Dominance OR Steadiness skew analysis - high surprise
+            var surprisePercent = (emotions.surprise / tonals.length) * 100;
+            if( (Math.round(surprisePercent - 8)) >= 0){
+                dominanceCounter++;
+            } else { 
                 steadinessCounter++; }
 
+            // Dominance OR Steadiness skew analysis - low fear
+            var fearPercent = (emotions.fear / tonals.length) * 100;
+            if( (Math.round(fearPercent - 10)) <= 0){
+                dominanceCounter++;
+            } else { 
+                steadinessCounter++; }
+
+            // Dominance OR Steadiness skew analysis - low trust
+            var trustPercent = (emotions.trust / tonals.length) * 100;
+            if( (Math.round(trustPercent - 17)) <= 0){
+                dominanceCounter++;
+            } else { 
+                steadinessCounter++; }
+            
             console.log('Dominance: ' + dominanceCounter + ' && ' + 'Steadiness: ' + steadinessCounter);
 
             var influenceCounter = 0;
             var complianceCounter = 0;
 
-            // Influence OR Compliance skew analysis - low fear
-            var fearPercent = (emotions.fear / tonals.length) * 100;
-            if( Math.round((fearPercent - 9)) <= 0){
+            // Influence OR Compliance skew analysis - high positivity
+            var positivityPercent = (emotions.positive / tonals.length) * 100;
+            if( Math.round((positivityPercent - 66)) >= 0){
                 influenceCounter++;
-            } else if ((Math.round(fearPercent - 11)) >= 0){ 
+            } else { 
                 complianceCounter++; }
 
-            // Influence OR Compliance skew analysis - high trust
-            var trustPercent = (emotions.trust / tonals.length) * 100;
-            if( Math.round((trustPercent - 19)) >= 0){
+            // Influence OR Compliance skew analysis - high mention count
+            if( (Math.round(mentionPercent - 10)) >= 0){
                 influenceCounter++;
-            } else if ((Math.round(trustPercent - 15)) <= 0){ 
-                complianceCounter++; }
-
-            // Influence OR Compliance skew analysis - high joy
-            var joyPercent = (emotions.joy / tonals.length) * 100;
-            if( Math.round((joyPercent - 22)) >= 0){
-                influenceCounter++;
-            } else if ((Math.round(trustPercent - 18)) <= 0){ 
+            } else { 
                 complianceCounter++; }
 
             // Influence OR Compliance skew analysis - high anticipation
             var anticipationPercent = (emotions.anticipation / tonals.length) * 100;
-            if( Math.round((anticipationPercent - 18)) >= 0){
+            if( Math.round((anticipationPercent - 16)) >= 0){
                 influenceCounter++;
-            } else if ((Math.round(trustPercent - 14)) <= 0){ 
+            } else { 
+                complianceCounter++; }
+            
+            // Influence OR Compliance skew analysis - high joy
+            var joyPercent = (emotions.joy / tonals.length) * 100;
+            if( Math.round((joyPercent - 20)) >= 0){
+                influenceCounter++;
+            } else { 
+                complianceCounter++; }
+            
+            // Influence OR Compliance skew analysis - high trust
+            var trustPercent = (emotions.trust / tonals.length) * 100;
+            if( Math.round((trustPercent - 17)) >= 0){
+                influenceCounter++;
+            } else { 
                 complianceCounter++; }
 
+            // Influence OR Compliance skew analysis - low fear
+            var fearPercent = (emotions.fear / tonals.length) * 100;
+            if( Math.round((fearPercent - 10)) <= 0){
+                influenceCounter++;
+            } else { 
+                complianceCounter++; }
+    
             console.log('Influence: ' + influenceCounter + ' && ' + 'Compliance: ' + complianceCounter);
+
+            console.log();
+            console.log("D: " + (dominanceCounter / 12) * 100);
+            console.log("I: " + (influenceCounter / 12) * 100);
+            console.log("S: " + (steadinessCounter / 12) * 100);
+            console.log("C: " + (complianceCounter / 12) * 100);
 
             /* Percentage skew towards dominance or steadiness 
             var emotiveWordSkew = (Math.round( (tonals.length / totalWords) * 100 )) - 8;
