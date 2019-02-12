@@ -12,11 +12,14 @@ var config = require('./config');
 
 // Setup twitter connection details
 var T = new twit(config);
-var usernames = ['ElleGuest', 'chloeguest92', 'Elisemorgan789', 'LiamFrailing', 'MWyatt4', 'andy_elliott95', 'Ryantaylor1996', 'iAlexDean', 'JimmyMcArthur2', 'jakeypowell95'];
-var username = usernames[0];
+var usernames = ['ElleGuest', 'chloeguest92', 'Elisemorgan789', 'LiamFrailing', 'MWyatt4', 'andy_elliott95', 'Ryantaylor1996', 
+'iAlexDean', 'JimmyMcArthur2', 'jakeypowell95', 'Schofe', 'hollywills', 'realDonaldTrump', 'HillaryClinton', 'antmiddleton',
+'Vibeplace', 'saguest67', 'Markjohn_stuart'];
+var username = usernames[1];
 
 getGender(username);
 getPersonalityProfile(username);
+getAgeRange(username);
 
 // Determine the gender of the given user
 function getGender(username){
@@ -47,7 +50,7 @@ function getGender(username){
                     }
                     if(results.length == 1){
                         if(results[0].Quantity >= 50){
-                            console.log("Likely gender for this name: " + results[0].Gender);
+                            console.log("Likely gender: " + results[0].Gender);
                         }
                         else{
                             // correlation not strong enough... cannot classify
@@ -67,10 +70,10 @@ function getGender(username){
                             // check difference greater than 70% relative to total quantity
                             if ( dif / (first + second ) > 0.7) { 
                                 if (first > second){
-                                    console.log("Likely gender for this name: " + results[0].Gender);
+                                    console.log("Likely gender: " + results[0].Gender);
                                 }
                                 else {
-                                    console.log("Likely gender for this name: " + results[1].Gender);
+                                    console.log("Likely gender: " + results[1].Gender);
                                 }
                             }
                             else {
@@ -83,6 +86,47 @@ function getGender(username){
                         console.log("No names match the input");
                     }
             })
+    }
+}
+
+// Determine the age range of the given user
+function getAgeRange(username){
+
+    var params = {
+        screen_name: username,
+        count: 3200,
+        include_rts: false
+    }
+
+    var txt = '';
+
+    T.get('statuses/user_timeline', params, gotData);
+
+    function gotData(err, data, response){
+        
+        for (var i = 0; i < data.length; i++) {
+            txt += data[i].text;           
+        }
+
+        const predictAge = require('predictage')
+        
+        // These are the default and recommended options
+        const opts = {  
+            'encoding': 'freq',
+            'locale': 'GB',
+            'logs': 3,
+            'max': Number.POSITIVE_INFINITY,
+            'min': Number.NEGATIVE_INFINITY,
+            'noInt': false,
+            'output': 'lex',
+            'places': undefined,
+            'sortBy': 'lex',
+        }
+        const age = predictAge(txt, opts)
+
+        if(age.AGE < 30){
+            console.log('Likely age range: 16-30');
+        } else { console.log('Likely age range: 30+'); }
     }
 }
 
@@ -104,8 +148,6 @@ function getPersonalityProfile(username){
         for (var i = 0; i < data.length; i++) {
             txt += data[i].text;           
         }
-
-        console.log(txt);
         
         var totalWords = txt.split(' ').length;
         var sentiment = new Sentiment();
@@ -133,29 +175,29 @@ function getPersonalityProfile(username){
                         }
                 }
             }
-            console.log(totalWords);
-            console.log(tonals.length);
-            console.log(emotions);
+            //console.log(totalWords);
+            //console.log(tonals.length);
+            //console.log(emotions);
+            //console.log((tonals.length / totalWords) * 100);
 
-            console.log((tonals.length / totalWords) * 100);
             var numMentions = 0;
             for (var i = 0; i < txt.length; i++) {
                 if (txt.charAt(i) == "@") {
                    numMentions ++;
                 }
             }
-            console.log((numMentions / totalWords) * 100 );
-            console.log((emotions.anger / tonals.length) * 100 );
-            console.log((emotions.surprise / tonals.length) * 100 );
-            console.log((emotions.fear / tonals.length) * 100 );
-            console.log((emotions.trust / tonals.length) * 100 );
-            console.log();
-            console.log((emotions.positive / tonals.length) * 100 );
-            console.log((numMentions / totalWords) * 100 );
-            console.log((emotions.anticipation / tonals.length) * 100 );
-            console.log((emotions.joy / tonals.length) * 100 );
-            console.log((emotions.trust / tonals.length) * 100 );
-            console.log((emotions.fear / tonals.length) * 100 );
+            //console.log((numMentions / totalWords) * 100 );
+            //console.log((emotions.anger / tonals.length) * 100 );
+            //console.log((emotions.surprise / tonals.length) * 100 );
+            //console.log((emotions.fear / tonals.length) * 100 );
+            //console.log((emotions.trust / tonals.length) * 100 );
+            //console.log();
+            //console.log((emotions.positive / tonals.length) * 100 );
+            //console.log((numMentions / totalWords) * 100 );
+            //console.log((emotions.anticipation / tonals.length) * 100 );
+            //console.log((emotions.joy / tonals.length) * 100 );
+            //console.log((emotions.trust / tonals.length) * 100 );
+            //console.log((emotions.fear / tonals.length) * 100 );
 
             var dominanceCounter = 0;
             var steadinessCounter = 0;
@@ -208,7 +250,7 @@ function getPersonalityProfile(username){
             } else { 
                 steadinessCounter++; }
             
-            console.log('Dominance: ' + dominanceCounter + ' && ' + 'Steadiness: ' + steadinessCounter);
+            //console.log('Dominance: ' + dominanceCounter + ' && ' + 'Steadiness: ' + steadinessCounter);
 
             var influenceCounter = 0;
             var complianceCounter = 0;
@@ -254,49 +296,13 @@ function getPersonalityProfile(username){
             } else { 
                 complianceCounter++; }
     
-            console.log('Influence: ' + influenceCounter + ' && ' + 'Compliance: ' + complianceCounter);
+            //console.log('Influence: ' + influenceCounter + ' && ' + 'Compliance: ' + complianceCounter);
 
-            console.log();
-            console.log("D: " + (dominanceCounter / 12) * 100);
-            console.log("I: " + (influenceCounter / 12) * 100);
-            console.log("S: " + (steadinessCounter / 12) * 100);
-            console.log("C: " + (complianceCounter / 12) * 100);
-
-            /* Percentage skew towards dominance or steadiness 
-            var emotiveWordSkew = (Math.round( (tonals.length / totalWords) * 100 )) - 8;
-            var emotiveVariationSkew = Math.round(Math.abs( (emotions.positive - emotions.negative) /  (emotions.positive + emotions.negative) * 100 )) - 16;
-
-            /* conditions for DOMINANCE: 
-                - High % of emotive words relative to total word count
-                - High % of emotional variation (difference between pos/neg word count is low suggesting emotional swings)
-            if(Math.round(tonals.length / totalWords) > 0.08 && 
-                Math.round(Math.abs(emotions.positive - emotions.negative) / (emotions.positive + emotions.negative)) <= 0.16){
-                console.log("Dominance: YES");
-            } else { console.log("Dominance: NO"); }
-
-            /* conditions for INFLUENCE: 
-                - High % of trust words relative to tonal word count
-                - High % of anticipation words relative to tonal word count 
-                - High % of joy words relative to tonal word count
-            if(Math.round(emotions.trust / tonals.length) > 0.13 && Math.round(emotions.fear / tonals.length) <= 0.1){
-                console.log("Influence: YES");
-            } else { console.log("Influence: NO"); }
-
-            /* conditions for STEADINESS: 
-                - Low % of emotional variation (difference between pos/neg word count)
-                - High % of joy relative to tonal word count
-            if(Math.round(tonals.length / totalWords) <= 0.08 && 
-                Math.round(Math.abs(emotions.positive - emotions.negative) / (emotions.positive + emotions.negative)) > 0.16){
-                console.log("Steadiness: YES");
-            } else { console.log("Steadiness: NO"); }
-
-            /* conditions for COMPLIANCE: 
-                - Low % of trust words relative to tonal word count
-                - High % of fear words relative to tonal word count
-            if(Math.round(emotions.trust / tonals.length) <= 0.13 && Math.round(emotions.fear / tonals.length) > 0.1){
-                console.log("Compliance: YES");
-            } else { console.log("Compliance: NO"); }
-            /* No personality profile identified */
+            console.log('Likely personality profile:');
+            console.log("  D: " + (dominanceCounter / 12) * 100);
+            console.log("  I: " + (influenceCounter / 12) * 100);
+            console.log("  S: " + (steadinessCounter / 12) * 100);
+            console.log("  C: " + (complianceCounter / 12) * 100);
         })
     }
 
