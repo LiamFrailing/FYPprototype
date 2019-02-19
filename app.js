@@ -4,22 +4,24 @@ To run application:
     node app.js
 */
 
-// Node modules required for app
-var csvtojson = require("csvtojson");
-var Sentiment = require('./node_modules/sentiment');
-var twit = require('./node_modules/twit');
-var config = require('./config');
+function init(){
+    // Node modules required for app
+    var csvtojson = require ("csvtojson");
+    var Sentiment = require ('sentiment');
+    var twit = require ('twit');
+    var config = require ('./config');
 
-// Setup twitter connection details
-var T = new twit(config);
-var usernames = ['ElleGuest', 'chloeguest92', 'Elisemorgan789', 'LiamFrailing', 'MWyatt4', 'andy_elliott95', 'Ryantaylor1996', 
-'iAlexDean', 'JimmyMcArthur2', 'jakeypowell95', 'Schofe', 'hollywills', 'realDonaldTrump', 'HillaryClinton', 'antmiddleton',
-'Vibeplace', 'saguest67', 'Markjohn_stuart'];
-var username = usernames[1];
+    // Setup twitter connection details
+    var T = new twit(config);
+    var usernames = ['ElleGuest', 'chloeguest92', 'Elisemorgan789', 'LiamFrailing', 'MWyatt4', 'andy_elliott95', 'Ryantaylor1996', 
+    'iAlexDean', 'JimmyMcArthur2', 'jakeypowell95', 'Schofe', 'hollywills', 'realDonaldTrump', 'HillaryClinton', 'antmiddleton',
+    'Vibeplace', 'saguest67', 'Markjohn_stuart'];
+    var username = usernames[1];
 
-getGender(username);
-getPersonalityProfile(username);
-getAgeRange(username);
+    //getGender(username);
+    //getPersonalityProfile(username);
+    //getAgeRange(username);
+}
 
 // Determine the gender of the given user
 function getGender(username){
