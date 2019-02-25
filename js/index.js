@@ -48,7 +48,7 @@ var questions = [
     inputField.focus()
     showCurrent()
   }
-  
+  /*
   // when all the questions have been answered
   function done() {
     
@@ -57,21 +57,27 @@ var questions = [
     
     // add the h1 at the end with the welcome text
     var h1 = document.createElement('h1')
-    h1.appendChild(document.createTextNode('Welcome ' + questions[0].value + '!'))
+    h1.appendChild(document.createTextNode('Here are the predictions for @' + questions[0].value))
+    var p1 = document.createElement('p')
+    p1.appendChild(document.createTextNode(getGender(questions[0].value)))
+
+    //document.write(myTable);
+
     setTimeout(function() {
-      register.parentElement.appendChild(h1)     
-      setTimeout(function() {h1.style.opacity = 1}, 50)
+      register.parentElement.appendChild(h1)  
+      h1.append(p1)  
+      setTimeout(function() {
+        h1.style.opacity = 1
+        p1.style.opacity = 1}, 50)
     }, eTime)
     
-  }
+  }*/
 
   // when submitting the current question
   function validate() {
 
     // set the value of the field into the array
     questions[position].value = inputField.value
-    init();
-    getGender(inputField.value);
 
     // check if the pattern matches
     if (!inputField.value.match(questions[position].pattern || /.+/)) wrong()
@@ -81,8 +87,8 @@ var questions = [
       progress.style.width = ++position * 100 / questions.length + 'vw'
 
       // if there is a new question, hide current and load next
-      if (questions[position]) hideCurrent(putQuestion)
-      else hideCurrent(done)
+      //if (questions[position]) hideCurrent(putQuestion)
+     // else hideCurrent(done)
              
     })
 
@@ -123,5 +129,6 @@ var questions = [
     setTimeout(transform, tTime * 6, 0, 0)
     setTimeout(callback,  tTime * 7)
   }
-
 }())
+
+
