@@ -21,9 +21,12 @@
   <div id="register">
 
     <div id="results">
-      <p>Hello</p>
+      <h1>Predictions for @<%= username %></h1>
       <% if(gender !== null){ %>
         <p><%= gender %></p>
+      <% } %>
+      <% if(age !== null){ %>
+        <p><%= age %></p>
       <% } %>
   </div>
 

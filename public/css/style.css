@@ -4,11 +4,18 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-h1, h2, p {
+h1 {
   position: relative;
   color: #fff;
   opacity: 0;
   transition: .8s ease-in-out;
+}
+
+#results h2 {
+  text-align: center;
+  color: #000;
+  opacity: 1;
+  transition: none;
 }
 
 #results p {

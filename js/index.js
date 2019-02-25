@@ -88,7 +88,7 @@ var questions = [
 
       // if there is a new question, hide current and load next
       //if (questions[position]) hideCurrent(putQuestion)
-     // else hideCurrent(done)
+      // else hideCurrent(done)
              
     })
 
