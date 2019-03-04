@@ -1,2 +1,1 @@
-Male, 
-Age range: 16-30
+Gender: Male,Age: 16-30,Dominance: 42%,Influence: 33%,Steadiness: 8%,Compliance: 17%

@@ -20,10 +20,11 @@
 <div class="center">
   <div id="register">
 
-    <i id="progressButton" class="ion-android-arrow-forward next"></i>
-
+    <!--<a id="progressButton" class="ion-android-arrow-forward next"></a>-->
+    <a onclick="document.getElementById('usernameForm').submit();" id="progressButton" class="ion-android-arrow-forward next"></a>
+    
     <div id="inputContainer">
-        <form action="/" method="POST">
+        <form action="/" method="POST" id="usernameForm">
             <input name="username" id="inputField" required autofocus />
             <label id="inputLabel"></label>
             <div id="inputProgress"></div>
