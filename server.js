@@ -36,10 +36,12 @@ app.post('/', function (req, res) {
       fs.readFile('profile.txt', (err, data) => {
         if (err) throw err;
 
-        var results = data.toString().split(',');
+        var results = data.toString().split('|');
         if(!results.length < 6){
-            res.render('results', {username:req.body.username, gender: results[0], age: results[1], dominance: results[2], 
-            influence: results[3], steadiness: results[4], compliance: results[5]});
+            res.render('results', {username:req.body.username, gender: results[0], age: results[1], 
+                personalityHeader1: results[2], personalityDescription1: results[3],
+                personalityHeader2: results[4], personalityDescription2: results[5]
+            });
         }
       });
     }
@@ -83,7 +85,7 @@ function getGender(username){
                   }
                   if(results.length == 1){
                       if(results[0].Quantity >= 50){
-                          gender = "Gender: " + results[0].Gender + ",";
+                          gender = "Gender: " + results[0].Gender + "|";
                       }
                       else{
                           // correlation not strong enough... cannot classify
@@ -103,10 +105,10 @@ function getGender(username){
                           // check difference greater than 70% relative to total quantity
                           if ( dif / (first + second ) > 0.7) { 
                               if (first > second){
-                                  gender = "Gender: " + results[0].Gender + ",";
+                                  gender = "Gender: " + results[0].Gender + "|";
                               }
                               else {
-                                  gender = "Gender: " + results[1].Gender + ",";
+                                  gender = "Gender: " + results[1].Gender + "|";
                               }
                           }
                           else {
@@ -116,7 +118,7 @@ function getGender(username){
                   }
                   else {
                       // no matches found in csv
-                      gender = "Gender: undetermined,";
+                      gender = "Gender: undetermined|";
                   }
                   // write to a new file named gender.txt
                   fs.writeFile('profile.txt', gender, (err) => {  
@@ -171,8 +173,8 @@ function getAgeRange(username){
       const age = predictAge(txt, opts)
 
       if(age.AGE < 30){
-          ageRange = "Age: 16-30,";
-      } else { ageRange = "Age: 30+,"; }
+          ageRange = "Age: 16-30|";
+      } else { ageRange = "Age: 30+|"; }
 
       fs.appendFileSync('profile.txt', ageRange, (err) => {  
         // throws an error, you could also catch it here
@@ -338,37 +340,89 @@ function getPersonalityProfile(username){
           } else { 
               complianceCounter++; }
 
-          fs.appendFileSync('profile.txt', "Dominance: " + Math.round((dominanceCounter / 12) * 100) + "%,", (err) => {  
-            // throws an error, you could also catch it here
-            if (err) throw err;
-    
-            // success case, the file was saved
-            console.log('Dominance score saved!');
-          });
+        var results = [Math.round((dominanceCounter / 12) * 100), Math.round((influenceCounter / 12) * 100), Math.round((steadinessCounter / 12) * 100), Math.round((complianceCounter / 12) * 100)];
+        
+        // variable to store maximum counter value
+        var maxVal = results[0];
+        var maxIndex = 0;
 
-          fs.appendFileSync('profile.txt', "Influence: " + Math.round((influenceCounter / 12) * 100) + "%,", (err) => {  
-            // throws an error, you could also catch it here
-            if (err) throw err;
-    
-            // success case, the file was saved
-            console.log('Influence score saved!');
-          });
+        // 2nd variable to store maximum counter value
+        // only needed if 2 maximum are the same
+        var maxVal2 = null;
+        var maxIndex2 = 0;
 
-          fs.appendFileSync('profile.txt', "Steadiness: " + Math.round((steadinessCounter / 12) * 100) + "%,", (err) => {  
-            // throws an error, you could also catch it here
-            if (err) throw err;
-    
-            // success case, the file was saved
-            console.log('Steadiness score saved!');
-          });
+        for (var i = 1; i < results.length; i++) {
+            console.log("Current max: " + maxVal + "New value: " + results[i]);
+            if (results[i] > maxVal) {
+              maxVal = results[i];
+              maxIndex = i;
+            } else if (results[i] == maxVal){
+                maxVal2 = results[i];
+                maxIndex2 = i;
+            }
+        }
+        //dominance is predominant profile
+        if(maxIndex == 0){
+            fs.appendFileSync('profile.txt', "Personality: High Dominance| A goal orientated person who enjoys competition and challenge. " + 
+            "This person aims high, wants authority and is generally resourceful and adaptable. " +
+            "They are usually self-sufficient and individualistic.", (err) => {  
+                // throws an error, you could also catch it here
+                if (err) throw err;
+              });
+        }
+        //influence is predominant profile
+        else if(maxIndex == 1){
+            fs.appendFileSync('profile.txt', "Personality: High Influence| A people person who enjoys being around others. " +
+            "This person is generally optimistic, outgoing, and socially skilled. " +
+            "They can often establish relationships very quickly. ", (err) => {  
+                // throws an error, you could also catch it here
+                if (err) throw err;
+              });
+        }
+        else if(maxIndex == 2){
+            fs.appendFileSync('profile.txt', "Personality: High Steadiness| A calm and controlled person who is typically very patient. " +
+            "This person has a high willingness to help others, particularly those they consider as friends. " +
+            "They have the ability to deal well with the task in hand and complete routine work with care.", (err) => {  
+                // throws an error, you could also catch it here
+                if (err) throw err;
+              });
+        }
+        else if(maxIndex == 3){
+            fs.appendFileSync('profile.txt', "Personality: High Compliance| A cautious person who responds well to authority. " +
+            "This person avoids risk-taking and typically acts in a diplomatic way so to enable a stable, ordered life. " +
+            "They are comfortable following procedures in both their personal and business life.", (err) => {  
+                // throws an error, you could also catch it here
+                if (err) throw err;
+              });
+        }
 
-          fs.appendFileSync('profile.txt', "Compliance: " + Math.round((complianceCounter / 12) * 100) + "%", (err) => {  
-            // throws an error, you could also catch it here
-            if (err) throw err;
-    
-            // success case, the file was saved
-            console.log('Compliance score saved!');
-          });
+        //influence is also predominant profile
+        if(maxIndex2 == 1){
+            fs.appendFileSync('profile.txt', "|Personality: High Influence| A people person who enjoys being around others. " +
+            "This person is generally optimistic, outgoing, and socially skilled. " +
+            "They can often establish relationships very quickly. ", (err) => {  
+                // throws an error, you could also catch it here
+                if (err) throw err;
+              });
+        }
+        //steadiness is also predominant profile
+        if(maxIndex2 == 2){
+            fs.appendFileSync('profile.txt', "|Personality: High Steadiness| A calm and controlled person who is typically very patient. " +
+            "This person has a high willingness to help others, particularly those they consider as friends. " +
+            "They have the ability to deal well with the task in hand and complete routine work with care.", (err) => {  
+                // throws an error, you could also catch it here
+                if (err) throw err;
+              });
+        }
+        //compliance is also predominant profile
+        if(maxIndex2 == 3){
+            fs.appendFileSync('profile.txt', "|Personality: High Compliance| A cautious person who responds well to authority. " +
+            "This person avoids risk-taking and typically acts in a diplomatic way so to enable a stable, ordered life. " +
+            "They are comfortable following procedures in both their personal and business life.", (err) => {  
+                // throws an error, you could also catch it here
+                if (err) throw err;
+              });
+        }
       })
   }
 }
